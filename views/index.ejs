@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Redis Data Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    td {
+      word-break: break-word;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    td.actions {
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .scrollable-table {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    p.no-data {
+      font-style: italic;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Redis Data Viewer</h1>
+
+  <!-- Form to extract data -->
+  <form action="/extract" method="post">
+    <input type="submit" value="Extract Data from Redis">
+  </form>
+
+  <!-- Display extracted data -->
+  <div class="scrollable-table">
+    <% if (data.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Type</th>
+            <th>Value</th>
+            <th class="actions">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% data.forEach(item => { %>
+            <tr>
+              <td><%= item.key %></td>
+              <td><%= item.type %></td>
+              <td><%= JSON.stringify(item.value, null, 2) %></td>
+              <td class="actions">
+                <form action="/delete" method="post">
+                  <input type="hidden" name="key" value="<%= item.key %>">
+                  <input type="submit" value="Delete">
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="no-data">No data available.</p>
+    <% } %>
+  </div>
+
+  <!-- Form to delete all data from Redis -->
+  <form action="/deleteAll" method="post">
+    <input type="submit" value="Delete All Data from Redis">
+  </form>
+</body>
+</html>
