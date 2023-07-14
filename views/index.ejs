@@ -35,16 +35,18 @@
       font-weight: bold;
     }
 
-    td {
-      word-break: break-word;
-      max-width: 300px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+
 
     td.actions {
       white-space: nowrap;
       text-align: center;
+      padding: 8px;
+    }
+      /* Adjust styles for smaller screens */
+    @media (max-width: 4px) {
+      td.actions {
+        padding: 4px; /* Reduced padding value for smaller screens */
+      }
     }
 
     .scrollable-table {
@@ -65,21 +67,86 @@
   <form action="/extract" method="post">
     <input type="submit" value="Extract Data from Redis">
   </form>
-
-  <!-- Display extracted data -->
-  <div class="scrollable-table">
-    <% if (data.length > 0) { %>
+  <% if (dataWithISOString.length > 0) { %>
+    <!-- Display keys with ISO string value -->
+    <h2>ACTIVE</h2>
+    <div class="scrollable-table">
       <table>
         <thead>
           <tr>
             <th>Key</th>
-            <th>Type</th>
+            
             <th>Value</th>
             <th class="actions">Action</th>
           </tr>
         </thead>
         <tbody>
-          <% data.forEach(item => { %>
+          <% dataWithISOString.forEach(item => { %>
+            <tr>
+              <td><%= item.key %></td>
+              
+              <td><%= JSON.stringify(item.value, null, 2) %></td>
+              <td class="actions">
+                <form action="/delete" method="post">
+                  <input type="hidden" name="key" value="<%= item.key %>">
+                  <input type="submit" value="Delete">
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+  <% if (dataWithE.length > 0) { %>
+    <!-- Display keys with value 'E' -->
+    <h2>'E'</h2>
+    <div class="scrollable-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+          
+            <th>Value</th>
+            <th class="actions">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% dataWithE.forEach(item => { %>
+            <tr>
+              <td><%= item.key %></td>
+           
+              <td><%= JSON.stringify(item.value, null, 2) %></td>
+              <td class="actions">
+                <form action="/delete" method="post">
+                  <input type="hidden" name="key" value="<%= item.key %>">
+                  <input type="submit" value="Delete">
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+
+  <% if (dataWithoutEAndISOString.length > 0) { %>
+    <!-- Display keys without value 'E' or ISO string value -->
+    <h2>Keys without value 'E' or ISO String Value</h2>
+    <div class="scrollable-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+       
+            <th>Value</th>
+            <th class="actions">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% dataWithoutEAndISOString.forEach(item => { %>
             <tr>
               <td><%= item.key %></td>
               <td><%= item.type %></td>
@@ -94,10 +161,8 @@
           <% }) %>
         </tbody>
       </table>
-    <% } else { %>
-      <p class="no-data">No data available.</p>
-    <% } %>
-  </div>
+    </div>
+  <% } %>
 
   <!-- Form to delete all data from Redis -->
   <form action="/deleteAll" method="post">
